@@ -1,5 +1,3 @@
-import sun.management.snmp.jvmmib.JvmThreadInstanceTableMeta;
-
 /**
  * ClassName: ArrayDeque
  * Package: PACKAGE_NAME
