@@ -45,14 +45,16 @@ public class ArrayDeque <T>{
         size++;
     }
 
-    public void resize(T[] a) {
+    private void resize(T[] a) {
 
         int re_lenght = 0;
 
         if (size == items.length) {
             re_lenght = items.length * 2;
-        }else {
+        }else if (size >= 8){
             re_lenght = items.length / 2;
+        }else {
+            re_lenght = items.length;
         }
 
         T[] copys = (T[]) new Object[re_lenght];
