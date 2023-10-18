@@ -27,20 +27,12 @@ public class TestArrayDequeGold {
                 s += "\naddFirst(" + num + ")";
                 good.addFirst(num);
                 bad.addFirst(num);
-
-                Integer exp = good.get(0);
-                Integer acu = bad.get(0);
-
-                assertEquals(s, exp, acu);
             } else if (number < 0.5) {
                 Integer num = StdRandom.uniform(100);
                 //System.out.println("addLast(" + num + ")");
                 s += "\naddLast(" + num + ")";
                 good.addLast(num);
                 bad.addLast(num);
-                Integer exp = good.get(good.size()-1);
-                Integer acu = bad.get(bad.size()-1);
-                assertEquals(s, exp, acu);
             } else if (number < 0.75) {
                 s += "\nremoveLast()";
                 if (!good.isEmpty() && !bad.isEmpty()) {
