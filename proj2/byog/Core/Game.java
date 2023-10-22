@@ -58,17 +58,15 @@ public class Game {
         }
     }
     //--------------------------------------------------------------------
-    private static int getRandomSeedFromInput(String input) {
+    private static long getRandomSeedFromInput(String input) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 1; i < input.length(); i++) {
+        for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
             if (Character.isDigit(c)) {
                 sb.append(c);
-            } else {
-                break;
             }
         }
-        return Integer.parseInt(sb.toString());
+        return Long.parseLong(sb.toString());
     }
 
     private void init(TETile[][] world, String input) {
