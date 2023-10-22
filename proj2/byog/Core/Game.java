@@ -301,10 +301,10 @@ public class Game {
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
 
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(WIDTH, HEIGHT);
 
-        TETile[][] finalWorldFrame = finalWorldFrame = new TETile[WIDTH][HEIGHT];
+        TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
         init(finalWorldFrame, input);
 
         List<Room> rooms = generateRooms(finalWorldFrame);
@@ -312,7 +312,7 @@ public class Game {
         addOutDoor(finalWorldFrame);
         addPlayer(finalWorldFrame);
 
-        ter.renderFrame(finalWorldFrame);
+//        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
     }
 }
