@@ -148,8 +148,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public V remove(K key) {
         Node keyNode = find(key, root);
-        V res = keyNode.value;
+        if (keyNode == null) return null;
 
+        V res = keyNode.value;
         // delete leaf node
         if (keyNode.left == null && keyNode.right == null) {
             if (keyNode.parent.left == keyNode) {
