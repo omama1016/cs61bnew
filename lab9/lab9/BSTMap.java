@@ -153,21 +153,37 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         V res = keyNode.value;
         // delete leaf node
         if (keyNode.left == null && keyNode.right == null) {
-            if (keyNode.parent.left == keyNode) {
+            // root node
+            if (keyNode.parent == null) {
+                root = null;
+            }
+            else if (keyNode.parent.left == keyNode) {
                 keyNode.parent.left = null; // delete the left child
             } else {
                 keyNode.parent.right = null; // delete the right child
             }
         } else if (keyNode.left == null) {
-            if (keyNode.parent.left == keyNode) {
+
+            if (keyNode.parent == null) {
+                root = keyNode.right;
+            }
+
+            else if (keyNode.parent.left == keyNode) {
+                keyNode.right.parent = keyNode.parent;
                 keyNode.parent.left = keyNode.right; // delete the left child
+
             } else {
                 keyNode.parent.right = keyNode.right; // delete the right child
                 keyNode.right.parent = keyNode.parent;
             }
         } else if (keyNode.right == null) {
-            if (keyNode.parent.left == keyNode) {
+
+            if (keyNode.parent == null) {
+                root = keyNode.left;
+            }
+            else if (keyNode.parent.left == keyNode) {
                 keyNode.parent.left = keyNode.left; // delete the left child
+                keyNode.left.parent = keyNode.parent;
             } else {
                 keyNode.parent.right = keyNode.left; // delete the right child
                 keyNode.left.parent = keyNode.parent;
