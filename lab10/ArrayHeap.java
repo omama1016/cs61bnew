@@ -205,6 +205,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
                 contents[i].myPriority = priority;
                 if (priority > curPriority) sink(i);
                 else swim(i);
+                return;
             }
         }
     }
@@ -453,7 +454,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         pq.insert("c", 3);
         pq.insert("d", 4);
         System.out.println(pq);
-        pq.changePriority("e", 0);
+        pq.changePriority("g", 0);
         System.out.println(pq);
     }
 
