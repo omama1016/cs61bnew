@@ -32,20 +32,25 @@ public class MazeBreadthFirstPaths extends MazeExplorer {
         // TODO: Your code here. Don't forget to update distTo, edgeTo, and marked, as well as call announce()
         Queue<Integer> queue = new ArrayDeque<>();
         queue.add(s);
+        marked[s] = true;
+        announce();
+        if (s == t) {
+            targetFound = true;
+            return;
+        }
+
         while (!queue.isEmpty()) {
             int v = queue.poll();
-            marked[v] = true;
-            announce();
-            if (v == t) {
-                targetFound = true;
-                return;
-            }
             for (int w : maze.adj(v)) {
                 if (!marked[w]) {
                     edgeTo[w] = v;
+                    marked[w] = true;
                     announce();
                     distTo[w] = distTo[v] + 1;
                     queue.add(w);
+                    if (w == t) {
+                        return;
+                    }
                 }
             }
         }
