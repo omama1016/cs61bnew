@@ -1,9 +1,5 @@
-import junit.framework.TestCase;
-import sun.util.locale.provider.HostLocaleProviderAdapterImpl;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.PrimitiveIterator;
 
 /**
  * This class provides all code necessary to take a query box and produce
