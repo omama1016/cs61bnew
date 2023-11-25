@@ -1,5 +1,7 @@
+import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +14,32 @@ import java.util.regex.Pattern;
  * down to the priority you use to order your vertices.
  */
 public class Router {
+    private static class SearchNode implements Comparable<SearchNode>{
+        long id;
+        double lon;
+        double lat;
+        double distance;
+        double priority;
+
+        public SearchNode(long id, double lon, double lat, double distanceToS, double distanceToT) {
+            this.id = id;
+            this.lon = lon;
+            this.lat = lat;
+            this.distance = distanceToS;
+            this.priority = distanceToT;
+        }
+
+        @Override
+        public int compareTo(SearchNode o) {
+            if (this.priority - o.priority < 0) {
+                return -1;
+            } else if (this.priority - o.priority > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -25,7 +53,60 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+
+        // used for the marked set
+        Set<Long> marked = new HashSet<>();
+        // used for the best
+        Map<Long, Double> best = new LinkedHashMap<>();
+        Map<Long, Long> parent = new LinkedHashMap<>();
+        // used to store the path
+        List<Long> path = new LinkedList<>();
+        Stack<Long> stack = new Stack<>();
+
+        long startID = g.closest(stlon, stlat);
+        long endID = g.closest(destlon, destlat);
+        SearchNode startNode = new SearchNode(startID, g.lon(startID), g.lat(startID),
+                0, g.distance(startID, endID));
+        // initialize the best
+        best.put(startID, 0.0);
+        parent.put(startID, startID);
+        PriorityQueue<SearchNode> pq = new PriorityQueue<>();
+        pq.offer(startNode);
+        // search
+        while (!pq.isEmpty()) {
+            SearchNode v = pq.poll();
+            // ******* if we find the goal
+            if (v.id == endID) {
+                stack.push(v.id);
+                long cur = v.id;
+                while (cur != startID) {
+                    long parentID = parent.get(cur);
+                    stack.push(parentID);
+                    cur = parentID;
+                }
+            }
+            // ******* else relaxing
+            if (!marked.contains(v.id)) {
+                marked.add(v.id);
+                for (Long wID : g.adjacent(v.id)) {
+                    if (marked.contains(wID)) continue;
+                    double disVtoW = g.distance(v.id, wID);
+                    double disStoV = best.get(v.id);
+                    double disStoW = best.getOrDefault(wID, Double.MAX_VALUE);
+                    if (disStoV + disVtoW < disStoW) {
+                        best.put(wID, disStoV + disVtoW);
+                        parent.put(wID, v.id);
+                        // add w with the priority = dsv + dvw + h(w)
+                        double priority = disStoV + disVtoW + g.distance(wID, endID);
+                        pq.offer(new SearchNode(wID, g.lon(wID), g.lat(wID), disStoV + disVtoW, priority));
+                    }
+                }
+            }
+        }
+
+        for (Long v : stack) path.add(0, v);
+
+        return path; // FIXME
     }
 
     /**
@@ -37,9 +118,88 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+
+        if (route.size() == 0) return null;
+        List<NavigationDirection> res = new ArrayList<>();
+        String curWayName = g.getWay(route.get(0));
+        double curDis = 0;
+
+        if (route.size() == 1) {
+            addStartNavigation(res, curWayName, curDis);
+            return res;
+        }
+
+        int curIndex = 1;
+        // consider the starting case
+        while (curIndex < route.size()) {
+            curDis += g.distance(route.get(curIndex), route.get(curIndex-1));
+            if (!g.getWay(route.get(curIndex)).equals(curWayName) || g.getWayId(route.get(curIndex))
+                    != g.getWayId(route.get(curIndex - 1))) {
+                addStartNavigation(res, curWayName, curDis);
+                curDis = 0;
+                curWayName = g.getWay(route.get(curIndex));
+                break;
+            }
+
+            if (curIndex == route.size() - 1) {
+                addStartNavigation(res, curWayName, curDis);
+                return res;
+            }
+
+            curIndex += 1;
+        }
+
+        // consider not the starting case
+        if (curIndex != route.size() - 1) {
+            curIndex += 1;
+            while(curIndex < route.size()) {
+                curDis += g.distance(route.get(curIndex), route.get(curIndex - 1));
+                if (!g.getWay(route.get(curIndex)).equals(curWayName) || g.getWayId(route.get(curIndex))
+                        != g.getWayId(route.get(curIndex - 1))) {
+                    addIntervalNavigation(g, res, curWayName, curDis, route.get(curIndex), route.get(curIndex-1));
+                    curDis = 0;
+                    curWayName = g.getWay(route.get(curIndex));
+                }
+
+                if (curIndex == route.size() - 1) {
+                    addIntervalNavigation(g, res, curWayName, curDis, route.get(curIndex), route.get(curIndex-1));
+                }
+
+                curIndex += 1;
+            }
+
+        }
+
+        return res; // FIXME
     }
 
+    private static void addStartNavigation(List<NavigationDirection> res, String curWayName, double sDis) {
+        NavigationDirection s = new NavigationDirection();
+        s.direction = NavigationDirection.START;
+        s.way = curWayName;
+        s.distance = sDis;
+        res.add(s);
+    }
+
+    private static void addIntervalNavigation(GraphDB g, List<NavigationDirection> res, String curWayName,
+                                              double sDis, long v, long w) {
+        NavigationDirection s = new NavigationDirection();
+        s.direction = computeDirection(g, v, w);
+        s.way = curWayName;
+        s.distance = sDis;
+        res.add(s);
+    }
+
+    private static int computeDirection(GraphDB g, long v, long w) {
+        double bear = g.bearing(v, w);
+        if (bear >= -15 && bear <= 15) return NavigationDirection.STRAIGHT;
+        else if (bear >= -30 && bear < -15) return NavigationDirection.SLIGHT_LEFT;
+        else if (bear <= 30 && bear > 15) return NavigationDirection.SLIGHT_RIGHT;
+        else if (bear >= -100 && bear < -30) return NavigationDirection.LEFT;
+        else if (bear <= 100 && bear > 30) return NavigationDirection.RIGHT;
+        else if (bear < -100) return NavigationDirection.SHARP_LEFT;
+        else return NavigationDirection.SHARP_RIGHT;
+    }
 
     /**
      * Class to represent a navigation direction, which consists of 3 attributes:
