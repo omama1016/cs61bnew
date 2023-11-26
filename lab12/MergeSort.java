@@ -72,8 +72,7 @@ public class MergeSort {
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        if (items.isEmpty()) return null;
-        if (items.size() == 1) return items;
+        if (items.isEmpty() || items.size() == 1) return items;
 
         Queue<Item> copy = new Queue<>();
         for (Item item : items) {
@@ -86,8 +85,7 @@ public class MergeSort {
             Queue<Item> q2 = temps.dequeue();
             temps.enqueue(mergeSortedQueues(q1, q2));
         }
-        items = temps.dequeue();
-        return items;
+        return temps.dequeue();
     }
 
 //    public static void main(String[] args) {
