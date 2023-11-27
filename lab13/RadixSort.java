@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Class for doing Radix sort
  *
@@ -17,7 +20,36 @@ public class RadixSort {
      */
     public static String[] sort(String[] asciis) {
         // TODO: Implement LSD Sort
-        return null;
+        // find the max length
+        if (asciis.length == 0 || asciis.length == 1) return asciis;
+        int max = Integer.MIN_VALUE;
+        for (String s : asciis) {
+            if (s.length() > max) {
+                max = s.length();
+            }
+        }
+
+        Queue<String>[] queues = new Queue[256];
+        for (int i = 0; i < queues.length; i++) {
+            queues[i] = new LinkedList<>();
+        }
+
+        String[] copy = asciis.clone();
+
+        for (int i = max - 1; i >= 0; i--) {
+            for (String s : copy) {
+                int index = s.length() - 1 < i ? 0 : s.charAt(i);
+                queues[index].offer(s);
+            }
+            int k = 0;
+            for (int j = 0; j < queues.length; j++) {
+                while (!queues[j].isEmpty()) {
+                    copy[k++] = queues[j].poll();
+                }
+            }
+
+        }
+        return copy;
     }
 
     /**
