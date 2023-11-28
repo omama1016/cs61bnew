@@ -67,29 +67,60 @@ public class CountingSort {
      */
     public static int[] betterCountingSort(int[] arr) {
         // TODO make counting sort work with arrays containing negative numbers.
+//        int min = Integer.MAX_VALUE;
+//        for (int i : arr) {
+//            min = min < i ? min : i;
+//        }
+//        if (min >= 0) return naiveCountingSort(arr);
+//
+//        int max = Integer.MIN_VALUE;
+//        for (int i : arr) {
+//            max = max > i ? max : i;
+//        }
+//
+//        int minNums = Math.abs(min);
+//        int[] count = new int[max + minNums + 1];
+//        for (int e : arr) {
+//            count[e + minNums] += 1;
+//        }
+//
+//        int[] sorted = new int[arr.length];
+//        int k = 0;
+//        for (int i = 0; i < count.length; i++) {
+//            for (int j = 0; j < count[i]; j++) {
+//                sorted[k++] = i - minNums;
+//            }
+//        }
+//
+//        return sorted;
         int min = Integer.MAX_VALUE;
-        for (int i : arr) {
-            min = min < i ? min : i;
-        }
-        if (min >= 0) return naiveCountingSort(arr);
-
         int max = Integer.MIN_VALUE;
+        for (int value : arr) {
+            if (min > value) {
+                min = value;
+            }
+            if (max < value) {
+                max = value;
+            }
+        }
+        int[] counts = new int[max - min + 1];
         for (int i : arr) {
-            max = max > i ? max : i;
+            counts[i - min] += 1;
         }
 
-        int minNums = Math.abs(min);
-        int[] count = new int[max + minNums + 1];
-        for (int e : arr) {
-            count[e + minNums] += 1;
+        int[] starts = new int[max - min + 1];
+        int pos = 0;
+        for (int i = 0; i < starts.length; i += 1) {
+            starts[i] = pos;
+            pos += counts[i];
         }
 
         int[] sorted = new int[arr.length];
-        int k = 0;
-        for (int i = 0; i < count.length; i++) {
-            for (int j = 0; j < count[i]; j++) {
-                sorted[k++] = i - minNums;
-            }
+        for (int i = 0; i < arr.length; i += 1) {
+            int item = arr[i];
+            int place = starts[item - min];
+            sorted[place] = item;
+            starts[item - min] += 1;
         }
 
         return sorted;
