@@ -1,4 +1,6 @@
-package lab14lib;
+package lab14;
+
+import lab14lib.Generator;
 
 /**
  * ClassName: StrangeBitwiseGenerator
@@ -9,7 +11,7 @@ package lab14lib;
  * @Create 2023/11/28 15:30
  * @Version 1.0
  */
-public class StrangeBitwiseGenerator implements Generator{
+public class StrangeBitwiseGenerator implements Generator {
     private int period;
     private int state;
 

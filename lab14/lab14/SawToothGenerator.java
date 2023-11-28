@@ -1,6 +1,6 @@
-package lab14lib;
+package lab14;
 
-import edu.princeton.cs.algs4.StdAudio;
+import lab14lib.Generator;
 
 /**
  * ClassName: SawToothGenerator
@@ -11,7 +11,7 @@ import edu.princeton.cs.algs4.StdAudio;
  * @Create 2023/11/28 14:49
  * @Version 1.0
  */
-public class SawToothGenerator implements Generator{
+public class SawToothGenerator implements Generator {
 
     private int period;
     private int state;
